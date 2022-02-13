@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+
+<head>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="page-header" style="text-align: center;">
+                <h1>Spa</h1>
+                <button (click)="refresh()">Refresh</button>
+                <button (click)="resetReadings()">Reset Readings</button>
+            </div>
+
+            <h2>Current Temperature: <span *ngIf="recentTemps[0]">{{recentTemps[0].temperature}}</span></h2>
+            <br>
+
+            <h2>Recent Temperatures</h2>
+            <div>
+                <div *ngFor="let temp of recentTemps">
+                    Temp: {{temp.temperature}}
+                    Timestamp: {{temp.timestamp}}
+                </div>
+            </div>
+            <br>
+
+            <h2>Threshold Violations</h2>
+            <div>
+                <div *ngFor="let violations of thesholdViolations">
+                    Temp: {{violations.temperature}}
+                    Timestamp: {{violations.timestamp}}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

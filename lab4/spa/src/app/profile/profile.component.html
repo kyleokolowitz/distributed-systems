@@ -1,0 +1,26 @@
+<h1 style="text-align: center;">Profile</h1>
+<div style="margin: 0px 300px;">
+    <br><br>
+
+    <div style="font-size: x-large;">
+        <b>Name:</b> {{name}} <br>
+        <b>Location:</b> {{location}} <br>
+        <b>Contact Number:</b> {{contact_number}} <br>
+        <b>Threshold:</b> {{threshold}} <br>
+    </div>
+
+
+    <br>
+
+    <form #profile="ngForm" (ngSubmit)="updateProfile(profile.value)">
+        Name: <input type="text" name="name" ngModel>
+        <br />
+        Location: <input type="text" name="location" ngModel>
+        <br />
+        Contact Number: <input type="text" name="contact_number" ngModel>
+        <br />
+        Threshold: <input type="number" name="threshold" ngModel>
+        <br />
+        <input type="submit" value="Save">
+    </form>
+</div>
