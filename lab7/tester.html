@@ -1,0 +1,125 @@
+<html>
+
+<script>
+
+    let sensors = {};
+    let profile = {};
+    let readings = [];
+    let allReadings = {};
+
+    async function createSensor(name) {
+        await fetch('http://localhost:3000/sky/event/ckzxn2ean0023w8ou77xsdlo3/none/sensor/new_sensor?name=' + name)
+            .then(response => response.json())
+        //.then(data => console.log(data));
+    }
+
+    async function deleteSensor(name) {
+        await fetch('http://localhost:3000/sky/event/ckzxn2ean0023w8ou77xsdlo3/none/sensor/unneeded_sensor?name=' + name)
+            .then(response => response.json())
+        //.then(data => console.log(data));
+    }
+
+    async function getSensors() {
+        await fetch('http://localhost:3000/sky/cloud/ckzxn2ean0023w8ou77xsdlo3/manage_sensors/sensors')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                sensors = data;
+            });
+    }
+
+    async function getSensorProfile(eci) {
+        await fetch('http://localhost:3000/sky/cloud/' + eci + '/sensor_profile/profile')
+            .then(response => response.json())
+            .then(data => { console.log(data); profile = data; });
+    }
+
+    async function getSensorTemperatures(eci) {
+        await fetch('http://localhost:3000/sky/cloud/' + eci + '/temperature_store/temperatures')
+            .then(response => response.json())
+            .then(data => { console.log(data); readings = data; });
+    }
+
+    async function newSensorReading(eci) {
+        await fetch('http://localhost:3000/sky/event/' + eci + '/none/emitter/new_sensor_reading')
+            .then(response => response.json())
+    }
+
+    async function getAllSensorReading() {
+        await fetch('http://localhost:3000/sky/cloud/ckzxn2ean0023w8ou77xsdlo3/manage_sensors/temperatures')
+            .then(response => response.json())
+            .then(data => { console.log(data); allReadings = data; });
+    }
+
+    async function tests() {
+        console.log("Testing Sensor Manager Pico");
+        console.log("Existing sensors: ");
+        await getSensors();
+        let startingSensorCount = Object.keys(sensors).length;
+
+        // Create 3 test sensors
+        console.log("TEST: Create test sensors: 1, 2, 3");
+        await createSensor('Test Sensor 1');
+        await createSensor('Test Sensor 2');
+        await createSensor('Test Sensor 3');
+        await getSensors();
+        if (Object.keys(sensors).length == startingSensorCount + 3)
+            console.log("PASSED");
+        else
+            console.log("FAILED");
+
+        // Does not create existing test sensor 1
+        console.log("TEST: Does not create existing test sensor: 1");
+        await createSensor('Test Sensor 1');
+        await getSensors();
+        if (Object.keys(sensors).length == startingSensorCount + 3)
+            console.log("PASSED");
+        else
+            console.log("FAILED");
+
+        // Delete test sensor 2
+        console.log("TEST: Delete test sensor: 2");
+        await deleteSensor('Test Sensor 2');
+        await getSensors();
+        if (Object.keys(sensors).length == startingSensorCount + 2)
+            console.log("PASSED");
+        else
+            console.log("FAILED");
+
+        // Get profile of test sensor 3
+        console.log("TEST: Get profile for test sensor: 3");
+        await getSensorProfile(sensors["Test Sensor 3"]["testing_eci"]);
+        if (profile["name"] == "Test Sensor 3" && profile["contact_number"] == "9378290896")
+            console.log("PASSED");
+        else
+            console.log("FAILED");
+
+        // Get temperature readings of test sensor 3
+        console.log("TEST: Get temperature readings for test sensor: 3");
+        await newSensorReading(sensors["Test Sensor 3"]["testing_eci"]);
+        await newSensorReading(sensors["Test Sensor 3"]["testing_eci"]);
+        await newSensorReading(sensors["Test Sensor 3"]["testing_eci"]);
+        await getSensorTemperatures(sensors["Test Sensor 3"]["testing_eci"]);
+        if (readings.length == 3)
+            console.log("PASSED");
+        else
+            console.log("FAILED");
+
+        // Get temperature readings of all sensors
+        console.log("TEST: Get temperature readings for all sensors");
+        await getAllSensorReading();
+        if (Object.keys(allReadings).length == startingSensorCount + 2)
+            console.log("PASSED");
+        else
+            console.log("FAILED");
+
+        // Clean up
+        await deleteSensor('Test Sensor 1');
+        await deleteSensor('Test Sensor 3');
+    }
+
+</script>
+
+<button onclick="tests()">Run Tests</button><br><br>
+
+</html>
